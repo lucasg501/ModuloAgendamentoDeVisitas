@@ -1,0 +1,498 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "REST API",
+    "description": ""
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4000/"
+    }
+  ],
+  "paths": {
+    "/clientes/listar": {
+      "get": {
+        "tags": [
+          "Clientes"
+        ],
+        "summary": "Lista todos os clientes",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/clientes/gravar": {
+      "post": {
+        "tags": [
+          "Clientes"
+        ],
+        "summary": "Cria um novo cliente",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/cliente"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/corretor/listar": {
+      "get": {
+        "tags": [
+          "Corretor"
+        ],
+        "summary": "Lista todos os corretores",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/imovel/listar": {
+      "get": {
+        "tags": [
+          "Imovel"
+        ],
+        "summary": "Lista os imóveis",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/configMod/obter/{idCorretor}": {
+      "get": {
+        "tags": [
+          "Configurações"
+        ],
+        "summary": "Lista as configurações de um corretor",
+        "description": "",
+        "parameters": [
+          {
+            "name": "idCorretor",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/configMod/gravar": {
+      "post": {
+        "tags": [
+          "Configurações"
+        ],
+        "summary": "Grava as configurações",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/config"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/configMod/alterar": {
+      "post": {
+        "tags": [
+          "Configurações"
+        ],
+        "summary": "Altera as configurações",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/config"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/disponibilidade/listar": {
+      "get": {
+        "tags": [
+          "Disponibilidade"
+        ],
+        "summary": "Lista as disponibilidades",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/disponibilidade/obter/{idCorretor}": {
+      "get": {
+        "tags": [
+          "Disponibilidade"
+        ],
+        "summary": "Obtem uma disponibilidade",
+        "description": "",
+        "parameters": [
+          {
+            "name": "idCorretor",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/disponibilidade/gravar": {
+      "post": {
+        "tags": [
+          "Disponibilidade"
+        ],
+        "summary": "Grava uma nova disponibilidade",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/disponibilidade"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/disponibilidade/alterar": {
+      "put": {
+        "tags": [
+          "Disponibilidade"
+        ],
+        "summary": "Altera uma disponibilidade",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/disponibilidade"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/disponibilidade/excluir/{idDispo}": {
+      "delete": {
+        "tags": [
+          "Disponibilidade"
+        ],
+        "summary": "Exclui uma disponibilidade",
+        "description": "",
+        "parameters": [
+          {
+            "name": "idDispo",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/agendamento/listar": {
+      "get": {
+        "tags": [
+          "Agendamentos"
+        ],
+        "summary": "Lista todos os agendamentos",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/agendamento/obter/{idAgendamento}": {
+      "get": {
+        "tags": [
+          "Agendamentos"
+        ],
+        "summary": "Obtem um agendamento",
+        "description": "",
+        "parameters": [
+          {
+            "name": "idAgendamento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
+    "/agendamento/gravar": {
+      "post": {
+        "tags": [
+          "Agendamentos"
+        ],
+        "summary": "Grava um novo agendamento",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/agendamento"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agendamento/alterar": {
+      "put": {
+        "tags": [
+          "Agendamentos"
+        ],
+        "summary": "Altera um agendamento",
+        "description": "",
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/agendamento"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/agendamento/excluir/{idAgendamento}": {
+      "delete": {
+        "tags": [
+          "Agendamentos"
+        ],
+        "summary": "Exclui um agendamento",
+        "description": "",
+        "parameters": [
+          {
+            "name": "idAgendamento",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "cliente": {
+        "type": "object",
+        "properties": {
+          "idCliente": {
+            "type": "number",
+            "example": 0
+          },
+          "nomeCliente": {
+            "type": "string",
+            "example": "Roberval"
+          },
+          "telCliente": {
+            "type": "string",
+            "example": "18996670055"
+          },
+          "emailCliente": {
+            "type": "string",
+            "example": "robervalgatao@gmail.com"
+          },
+          "obsCliente": {
+            "type": "string",
+            "example": "n/a"
+          }
+        }
+      },
+      "corretor": {
+        "type": "object",
+        "properties": {
+          "idCorretor": {
+            "type": "number",
+            "example": 0
+          },
+          "nomeCorretor": {
+            "type": "string",
+            "example": "Cabecinha de guidão"
+          }
+        }
+      },
+      "config": {
+        "type": "object",
+        "properties": {
+          "idConfig": {
+            "type": "number",
+            "example": 0
+          },
+          "ativo": {
+            "type": "string",
+            "example": "S"
+          },
+          "modo": {
+            "type": "string",
+            "example": "A"
+          },
+          "idCorretor": {
+            "type": "number",
+            "example": 13
+          }
+        }
+      },
+      "disponibilidade": {
+        "type": "object",
+        "properties": {
+          "idDispo": {
+            "type": "number",
+            "example": 0
+          },
+          "diaSemana": {
+            "type": "string",
+            "example": "Segunda"
+          },
+          "hora": {
+            "type": "string",
+            "example": "08:00"
+          },
+          "idCorretor": {
+            "type": "number",
+            "example": 1
+          },
+          "ocupado": {
+            "type": "string",
+            "example": "S"
+          }
+        }
+      },
+      "agendamento": {
+        "type": "object",
+        "properties": {
+          "idAgendamento": {
+            "type": "number",
+            "example": 0
+          },
+          "idCli": {
+            "type": "number",
+            "example": 0
+          },
+          "idCorretor": {
+            "type": "number",
+            "example": 0
+          },
+          "idImovel": {
+            "type": "number",
+            "example": 0
+          },
+          "DtHr": {
+            "type": "string",
+            "example": "2021-01-01 00:00:00"
+          },
+          "aceito": {
+            "type": "string",
+            "example": "S"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "chaveapi",
+        "description": "chave para aut da api"
+      }
+    }
+  }
+}
