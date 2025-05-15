@@ -16,6 +16,24 @@ class ImovelController{
         }
     }
 
+    async obter(req,res){
+        try{
+            if(req.params.idImovel != undefined){
+                let imovelModel = new ImovelModel();
+                let imovel = await imovelModel.obter(req.params.idImovel);
+                if(imovel == null){
+                    res.status(400).json({msg:"Erro ao obter imovel"});
+                }else{
+                    res.status(200).json(imovel);
+                }
+            }else{
+                res.status(400).json({msg:"Erro Interno do servidor"});
+            }
+        }catch(ex){
+            res.status(500).json({msg:"Erro ao obter imovel"});
+        }
+    }
+
 
 }
 
