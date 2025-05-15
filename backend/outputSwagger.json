@@ -77,6 +77,30 @@
         }
       }
     },
+    "/imovel/obter/{idImovel}": {
+      "get": {
+        "tags": [
+          "Imovel"
+        ],
+        "summary": "Obtem um imovel",
+        "description": "",
+        "parameters": [
+          {
+            "name": "idImovel",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": ""
+          }
+        }
+      }
+    },
     "/configMod/obter/{idCorretor}": {
       "get": {
         "tags": [

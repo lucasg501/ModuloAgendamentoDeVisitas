@@ -9,4 +9,10 @@ router.get('/listar', (req,res) =>{
     ctrl.listar(req,res); 
 });
 
+router.get('/obter/:idImovel', (req,res) =>{ 
+    // #swagger.tags = ['Imovel']
+    // #swagger.summary = 'Obtem um imovel'
+    ctrl.obter(req,res); 
+});
+
 module.exports = router;

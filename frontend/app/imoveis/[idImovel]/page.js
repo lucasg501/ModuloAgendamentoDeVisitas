@@ -3,6 +3,8 @@
 import { useEffect, useState, useRef } from "react";
 import { use } from 'react';
 import httpClient from '@/app/utils/httpClient';
+import Calendar from "react-calendar";
+import 'react-calendar/dist/Calendar.css';
 
 export default function Imovel(propsPromise) {
     const { idImovel } = use(propsPromise.params); // Desestrutura o params corretamente
@@ -16,6 +18,29 @@ export default function Imovel(propsPromise) {
     const telCliente = useRef(null);
     const emailCliente = useRef(null);
     const obsCliente = useRef(null);
+
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+
+
+    function carregarDisponibilidade(){
+        let status = 0;
+        httpClient.get(`/disponibilidade/listar`)
+            .then(r=>{
+                status = r.status;
+            })
+            .then(r=>{
+                if(status === 200){
+                    return r.json();
+                }
+            })
+    }
+
+    useEffect(() => {
+        carregarDisponibilidade();
+    },[]);
+
 
     useEffect(() => {
         httpClient.get(`/imovel/obter/${idImovel}`)
@@ -47,7 +72,7 @@ export default function Imovel(propsPromise) {
                 <div className="container px-5">
                     <div className="row gx-5 align-items-center">
                         <div className="col-xl-5 col-xxl-6 d-none d-xl-block">
-                            <img style={{minWidth: '500px', minHeight: '300px', maxHeight: '300px', maxWidth: '500px'}} className="img-fluid rounded-3 my-5" src={imovel.foto} alt="Imagem da casa" />
+                            <img style={{ minWidth: '500px', minHeight: '300px', maxHeight: '300px', maxWidth: '500px' }} className="img-fluid rounded-3 my-5" src={imovel.foto} alt="Imagem da casa" />
                         </div>
                         <div className="col-lg-8 col-xl-7 col-xxl-6">
                             <div className="my-5 text-center text-xl-start">
@@ -65,47 +90,50 @@ export default function Imovel(propsPromise) {
             </header>
 
             {showModal && (
-                <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">
-                    <div className="modal-dialog">
-                        <div className="modal-content">
-                            <div className="modal-header">
-                                <h5 className="modal-title">Disponibilidades</h5>
-                                <button type="button" className="btn-close" onClick={fecharModal}></button>
-                            </div>
-                            <div className="modal-body">
-                                <table className="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Dia</th>
-                                            <th>Data</th>
-                                            <th>Horário</th>
-                                            <th>Agendar</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {/* Simula dados de disponibilidade */}
-                                        {["Segunda", "Terça"].map((dia, i) => (
-                                            <tr key={i}>
-                                                <td>{dia}</td>
-                                                <td>20/05/2025</td>
-                                                <td>10:00</td>
-                                                <td>
-                                                    <button className="btn btn-primary" onClick={() => abrirFormModal(dia, '20/05/2025', '10:00')}>
-                                                        Agendar
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div className="modal-footer">
-                                <button className="btn btn-secondary" onClick={fecharModal}>Fechar</button>
-                            </div>
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 1050
+                    }}
+                >
+                    <div
+                        style={{
+                            backgroundColor: 'white',
+                            borderRadius: '12px',
+                            padding: '2rem',
+                            width: 'fit-content',
+                            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)',
+                            maxWidth: '90%',
+                        }}
+                    >
+                        <h3 className="mb-3 text-center">Selecione uma Data</h3>
+                        <Calendar style={{borderRadius: 25 }}
+                            className="react-calendar"
+                            locale="pt-BR"
+                            firstDayOfWeek={1}
+                            minDate={startOfMonth}
+                            maxDate={endOfMonth}
+                            activeStartDate={startOfMonth}
+                            prevLabel={null}
+                            nextLabel={null}
+                        />
+                        <div className="d-flex justify-content-end mt-4">
+                            <button className="btn btn-secondary" onClick={fecharModal}>
+                                Fechar
+                            </button>
                         </div>
                     </div>
                 </div>
             )}
+
 
             {showFormModal && selectedSchedule && (
                 <div className="modal fade show" style={{ display: 'block' }} tabIndex="-1">

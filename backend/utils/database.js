@@ -13,7 +13,7 @@ class Database {
             port: 3306,
             database: 'hackatoon', //a database de cada um de vocês possui a nomenclatura DB_(RA)
             user: 'root', // usuario e senha de cada um de vocês é o RA
-            password: 'root',
+            password: 'ametis99',
         });
     }
 
