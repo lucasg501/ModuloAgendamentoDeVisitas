@@ -2,49 +2,41 @@
 import { useEffect, useState } from 'react';
 import httpClient from '../utils/httpClient';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSquareWhatsapp, faWhatsapp } from '@fortawesome/free-brands-svg-icons';
+import { faWhatsapp } from '@fortawesome/free-brands-svg-icons';
 
 export default function Formulario() {
-
     const [listaAgendamentos, setListaAgendamentos] = useState([]);
     const [listaClientes, setListaClientes] = useState([]);
     const [listaCorretores, setListaCorretores] = useState([]);
     const [listaImoveis, setListaImoveis] = useState([]);
-    const [filtro, setFiltro] = useState('todos');  // Estado para o filtro de visualização
+    const [filtro, setFiltro] = useState('todos');
+    const [filtroCorretor, setFiltroCorretor] = useState('todos');
 
     function listarAgendamentos() {
         httpClient.get("/agendamento/listar")
             .then(r => r.json())
-            .then(r => {
-                setListaAgendamentos(r);
-            })
+            .then(r => setListaAgendamentos(r))
             .catch(error => console.error('Erro ao listar agendamentos:', error));
     }
 
     function listarClientes() {
         httpClient.get("/clientes/listar")
             .then(r => r.json())
-            .then(r => {
-                setListaClientes(r);
-            })
+            .then(r => setListaClientes(r))
             .catch(error => console.error('Erro ao listar clientes:', error));
     }
 
     function listarCorretores() {
         httpClient.get("/corretor/listar")
             .then(r => r.json())
-            .then(r => {
-                setListaCorretores(r);
-            })
+            .then(r => setListaCorretores(r))
             .catch(error => console.error('Erro ao listar corretores:', error));
     }
 
     function listarImoveis() {
         httpClient.get("/imovel/listar")
             .then(r => r.json())
-            .then(r => {
-                setListaImoveis(r);
-            })
+            .then(r => setListaImoveis(r))
             .catch(error => console.error('Erro ao listar imóveis:', error));
     }
 
@@ -55,70 +47,42 @@ export default function Formulario() {
         listarImoveis();
 
         if ('Notification' in window && navigator.serviceWorker) {
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    console.log('Permissão para notificações concedida!');
-                } else {
-                    console.log('Permissão para notificações negada!');
-                }
-            });
+            Notification.requestPermission();
         }
     }, []);
 
-    // service-worker.js
-    self.addEventListener('push', event => {
-        const data = event.data.json();
-        const options = {
-            body: data.body,
-            icon: 'icon.png', // ícone da notificação
-            badge: 'badge.png',
-        };
-
-        event.waitUntil(
-            self.registration.showNotification(data.title, options)
-        );
-    });
     useEffect(() => {
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/service-worker.js')
-                .then(registration => {
-                    console.log('Service Worker registrado:', registration);
-                })
-                .catch(error => {
-                    console.log('Falha ao registrar o Service Worker:', error);
-                });
+                .then(registration => console.log('Service Worker registrado:', registration))
+                .catch(error => console.log('Falha ao registrar o Service Worker:', error));
         }
     }, []);
 
     useEffect(() => {
-        // Função que verifica e envia notificações
         const verificarAgendamentosPendentes = () => {
-            const agendamentosPendentes = listaAgendamentos.filter(agendamento => agendamento.aceito === null);
-            if (agendamentosPendentes.length > 0) {
-                // Envia a notificação para o usuário
-                if ('Notification' in window && Notification.permission === 'granted') {
-                    new Notification("Há agendamentos pendentes para confirmação!", {
-                        body: `Você tem ${agendamentosPendentes.length} agendamento(s) aguardando confirmação.`,
-                        icon: 'icon.png',
-                    });
-                }
+            const pendentes = listaAgendamentos.filter(a => a.aceito === null);
+            if (pendentes.length > 0 && Notification.permission === 'granted') {
+                new Notification("Há agendamentos pendentes para confirmação!", {
+                    body: `Você tem ${pendentes.length} agendamento(s) aguardando confirmação.`,
+                    icon: 'icon.png',
+                });
             }
         };
-
         verificarAgendamentosPendentes();
     }, [listaAgendamentos]);
 
+    const agendamentosFiltrados = listaAgendamentos.filter(agendamento => {
+        const statusOk =
+            filtro === 'todos' ? true :
+            filtro === 'finalizados' ? agendamento.aceito !== null :
+            filtro === 'sem_aceito' ? agendamento.aceito === null : true;
 
-    // Função para filtrar os agendamentos
-    const agendamentosFiltrados = listaAgendamentos.filter(value => {
-        if (filtro === 'todos') {
-            return true; // Exibe todos
-        } else if (filtro === 'finalizados') {
-            return value.aceito !== null; // Exibe apenas os finalizados
-        } else if (filtro === 'sem_aceito') {
-            return value.aceito === null; // Exibe apenas os sem status de aceito
-        }
-        return true;
+        const corretorOk =
+            filtroCorretor === 'todos' ? true :
+            agendamento.idCorretor === parseInt(filtroCorretor);
+
+        return statusOk && corretorOk;
     });
 
     return (
@@ -126,17 +90,36 @@ export default function Formulario() {
             <h1>Lista dos agendamentos</h1>
             <a href='/configuracao/criar' className='btn btn-primary'>Configurar Disponibilidade</a>
 
-            <div className='form-group'>
-                <label htmlFor="filtro">Filtrar:</label>
-                <select style={{ width: '200px', }}
+            <div className='form-group' style={{ marginTop: 10 }}>
+                <label htmlFor="filtro">Filtrar por status:</label>
+                <select
                     id="filtro"
                     className="form-control"
+                    style={{ width: '200px' }}
                     value={filtro}
                     onChange={(e) => setFiltro(e.target.value)}
                 >
                     <option value="todos">Todos</option>
                     <option value="finalizados">Finalizados</option>
                     <option value="sem_aceito">Sem Status de Aceito</option>
+                </select>
+            </div>
+
+            <div className='form-group' style={{ marginTop: 10 }}>
+                <label htmlFor="filtroCorretor">Filtrar por corretor:</label>
+                <select
+                    id="filtroCorretor"
+                    className="form-control"
+                    style={{ width: '200px' }}
+                    value={filtroCorretor}
+                    onChange={(e) => setFiltroCorretor(e.target.value)}
+                >
+                    <option value="todos">Todos</option>
+                    {listaCorretores.map(corretor => (
+                        <option key={corretor.idCorretor} value={corretor.idCorretor}>
+                            {corretor.nomeCorretor}
+                        </option>
+                    ))}
                 </select>
             </div>
 
@@ -156,84 +139,81 @@ export default function Formulario() {
                             <th>Aceito</th>
                         </tr>
                     </thead>
-
                     <tbody>
-                        {
-                            agendamentosFiltrados.map((value, index) => {
-                                // Formatar data e hora
-                                const dtHr = new Date(value.DtHr);
-                                const data = dtHr.toLocaleDateString('pt-BR');
-                                const hora = dtHr.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                        {agendamentosFiltrados.map((agendamento, index) => {
+                            const dtHr = new Date(agendamento.DtHr);
+                            const data = dtHr.toLocaleDateString('pt-BR');
+                            const hora = dtHr.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
-                                // Buscar os nomes correspondentes
-                                const cliente = listaClientes.find(c => c.idCliente === value.idCli);
-                                const corretor = listaCorretores.find(c => c.idCorretor === value.idCorretor);
-                                const imovel = listaImoveis.find(i => i.idImovel === value.idImovel);
+                            const cliente = listaClientes.find(c => c.idCliente === agendamento.idCli);
+                            const corretor = listaCorretores.find(c => c.idCorretor === agendamento.idCorretor);
+                            const imovel = listaImoveis.find(i => i.idImovel === agendamento.idImovel);
 
-                                return (
-                                    <tr key={index}>
-                                        <td>{value.idAgendamento}</td>
-                                        <td>{cliente ? cliente.nomeCliente : "Desconhecido"}</td>
-                                        <td>{cliente ? cliente.emailCliente : "Desconhecido"}</td>
-                                        <td>
-                                            <span>{cliente ? cliente.telCliente : "Desconhecido"}</span>
-                                            <a href={`https://wa.me/+55${cliente?.telCliente}`} target="_blank" rel="noopener noreferrer" style={{ marginLeft: "15px" }}>
+                            return (
+                                <tr key={index}>
+                                    <td>{agendamento.idAgendamento}</td>
+                                    <td>{cliente?.nomeCliente || "Desconhecido"}</td>
+                                    <td>{cliente?.emailCliente || "Desconhecido"}</td>
+                                    <td>
+                                        <span>{cliente?.telCliente || "Desconhecido"}</span>
+                                        {cliente?.telCliente && (
+                                            <a
+                                                href={`https://wa.me/+55${cliente.telCliente}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                style={{ marginLeft: "15px" }}
+                                            >
                                                 <FontAwesomeIcon icon={faWhatsapp} style={{ color: "green", height: 25 }} />
                                             </a>
-                                        </td>
-
-                                        <td>{cliente ? cliente.obsCliente : "Desconhecido"}</td>
-                                        <td>{corretor ? corretor.nomeCorretor : "Desconhecido"}</td>
-                                        <td style={{ maxWidth: '200px', overflow: 'hidden' }}>{imovel ? `${imovel.descImovel} (Referência: ${imovel.idImovel})` : "Desconhecido"}</td>
-                                        <td>{data}</td>
-                                        <td>{hora}</td>
-                                        <td>
-                                            {value.aceito === null ? (
-                                                <>
-                                                    <button
-                                                        className="btn btn-primary"
-                                                        onClick={() => {
-                                                            if (confirm('Tem certeza que deseja confirmar este agendamento como aceito?')) {
-                                                                httpClient.put(`/agendamento/alterar`, { aceito: 'S', idAgendamento: value.idAgendamento })
-                                                                    .then(r => r.json())
-                                                                    .then(r => {
-                                                                        alert(r.msg);
-                                                                        listarAgendamentos();
-                                                                        window.open(`https://wa.me/+55${cliente.telCliente}?text=Estamos entrando em contato para confirmar sua visita as ${hora} do dia ${data} `, "_blank");
-                                                                    })
-                                                                    .catch(error => console.error('Erro ao alterar agendamento:', error));
-                                                            }
-                                                        }}
-                                                    >
-                                                        Sim
-                                                    </button>
-                                                    <button
-                                                        style={{ marginLeft: 10 }}
-                                                        className="btn btn-danger"
-                                                        onClick={() => {
-                                                            if (confirm('Tem certeza que deseja rejeitar este agendamento?')) {
-                                                                httpClient.put(`/agendamento/alterar`, { aceito: 'N', idAgendamento: value.idAgendamento })
-                                                                    .then(r => r.json())
-                                                                    .then(r => {
-                                                                        alert(r.msg);
-                                                                        listarAgendamentos();
-                                                                        window.open(`https://wa.me/+55${cliente.telCliente}?text=Infelizmente não será possível fazermos a visita hoje :/`, "_blank");
-                                                                    })
-                                                                    .catch(error => console.error('Erro ao alterar agendamento:', error));
-                                                            }
-                                                        }}
-                                                    >
-                                                        Não
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <span style={{ color: 'green', fontWeight: 'bold' }}>Finalizado</span>
-                                            )}
-                                        </td>
-                                    </tr>
-                                );
-                            })
-                        }
+                                        )}
+                                    </td>
+                                    <td>{cliente?.obsCliente || "Desconhecido"}</td>
+                                    <td>{corretor?.nomeCorretor || "Desconhecido"}</td>
+                                    <td style={{ maxWidth: '200px', overflow: 'hidden' }}>
+                                        {imovel ? `${imovel.descImovel} (Referência: ${imovel.idImovel})` : "Desconhecido"}
+                                    </td>
+                                    <td>{data}</td>
+                                    <td>{hora}</td>
+                                    <td>
+                                        {agendamento.aceito === null ? (
+                                            <>
+                                                <button
+                                                    className="btn btn-primary"
+                                                    onClick={() => {
+                                                        if (confirm('Tem certeza que deseja confirmar este agendamento como aceito?')) {
+                                                            httpClient.put(`/agendamento/alterar`, { aceito: 'S', idAgendamento: agendamento.idAgendamento })
+                                                                .then(r => r.json())
+                                                                .then(r => {
+                                                                    alert(r.msg);
+                                                                    listarAgendamentos();
+                                                                    window.open(`https://wa.me/+55${cliente.telCliente}?text=Estamos entrando em contato para confirmar sua visita às ${hora} do dia ${data}.`, "_blank");
+                                                                });
+                                                        }
+                                                    }}
+                                                >Sim</button>
+                                                <button
+                                                    className="btn btn-danger"
+                                                    style={{ marginLeft: 10 }}
+                                                    onClick={() => {
+                                                        if (confirm('Tem certeza que deseja rejeitar este agendamento?')) {
+                                                            httpClient.put(`/agendamento/alterar`, { aceito: 'N', idAgendamento: agendamento.idAgendamento })
+                                                                .then(r => r.json())
+                                                                .then(r => {
+                                                                    alert(r.msg);
+                                                                    listarAgendamentos();
+                                                                    window.open(`https://wa.me/+55${cliente.telCliente}?text=Infelizmente não será possível fazermos a visita hoje :/`, "_blank");
+                                                                });
+                                                        }
+                                                    }}
+                                                >Não</button>
+                                            </>
+                                        ) : (
+                                            <span style={{ color: 'green', fontWeight: 'bold' }}>Finalizado</span>
+                                        )}
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             </div>

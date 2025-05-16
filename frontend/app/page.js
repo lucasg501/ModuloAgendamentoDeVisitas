@@ -19,7 +19,7 @@ export default function Home() {
 
     return (
         <div>
-            <h1 style={{ textAlign: 'center', marginBottom: '30px' }}>Tela dos imóveis</h1>
+            <h1 style={{ textAlign: 'center', marginBottom: '30px', fontFamily: 'Arial, sans-serif' }}>Imóveis Disponíveis</h1>
 
             <div
                 style={{
@@ -44,6 +44,7 @@ export default function Home() {
                         <img style={{ maxHeight: '200px', minHeight: '200px' }} src={value.foto} className="card-img-top" alt="..." />
                         <div className="card-body">
                             <p className="card-text">{value.descImovel}</p>
+                            <p>ID Corretor {value.idCorretor}</p>
                         </div>
                     </div>
                 ))}
